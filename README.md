@@ -4,6 +4,7 @@ BeerMe
 This is my first Android App for counting large and small beer at a pub.
 
 It shall contain three Buttons:
+
 	- add large beer
 	- add small beer
 	- undo last action
