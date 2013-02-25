@@ -11,7 +11,7 @@ There are three constraints if you want to use this app, code underlying this ap
 
 1. If you use parts of the code underlying in this app or the whole code, you need to mention the main contributor to this app: [DerJayDee](http://github.com/DerJayDee).
 2. You are not permitted to use any of the graphics or designs used in this app.
-3. For commercial use see [Commercial Use](http://www.github.com/DerJayDee/BeerMe/LICENSE.md#Commercial%20use)
+3. For commercial use see [Commercial Use](http://github.com/DerJayDee/BeerMe/blob/master/LICENSE.md#commercial-use)
 
 Commercial use
 --------------
