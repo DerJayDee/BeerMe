@@ -28,6 +28,9 @@ public class BeerMe extends Activity {
 	/** Counter for the amount of largeBeer */
 	private int largeBeer;
 
+	/** Displayes what was last changed: 0 --> nothing to undo, 1 --> small beer, 2 --> large beer */
+	private int lastChanged;
+
 	/**
 	 * This Method creates the Activity and sets the variables either 0 or the
 	 * value they were set to the last time that this Activity was run.
@@ -89,7 +92,8 @@ public class BeerMe extends Activity {
 	 */
 	public void addSmallBeer(View view) {
 		smallBeer++;
-//		postToast("small Beer:" + smallBeer);
+		lastChanged = 1;
+		// postToast("small Beer:" + smallBeer);
 		setTextView(R.id.small_beer_count, "" + smallBeer);
 	}
 
@@ -101,8 +105,33 @@ public class BeerMe extends Activity {
 	 */
 	public void addLargeBeer(View view) {
 		largeBeer++;
-//		postToast("large Beer:" + largeBeer);
+		lastChanged = 2;
+		// postToast("large Beer:" + largeBeer);
 		setTextView(R.id.large_beer_count, "" + largeBeer);
+	}
+
+	public void undo(View view) {
+		boolean undone = false;
+		switch (lastChanged) {
+		case 1:
+			smallBeer--;
+			setTextView(R.id.small_beer_count, ""+smallBeer);
+			undone = true;
+			lastChanged = 0;
+			break;
+		case 2:
+			largeBeer--;
+			setTextView(R.id.large_beer_count, ""+largeBeer);
+			undone = true;
+			lastChanged = 0;
+			break;
+		}
+		if(undone){
+			postToast(getString(R.string.undone));
+		} else {
+			postToast(getString(R.string.no_undo));
+		}
+		
 	}
 
 	/**
@@ -114,9 +143,10 @@ public class BeerMe extends Activity {
 	public void reset(View view) {
 		smallBeer = 0;
 		largeBeer = 0;
-//		postToast("reseted all counters");
+		// postToast("reseted all counters");
 		setTextView(R.id.large_beer_count, "" + largeBeer);
 		setTextView(R.id.small_beer_count, "" + smallBeer);
+		postToast(getString(R.string.reseted));
 	}
 
 	/**
@@ -127,7 +157,7 @@ public class BeerMe extends Activity {
 	 */
 	private void postToast(String s) {
 		Context context = getApplicationContext();
-		int duration = Toast.LENGTH_LONG;
+		int duration = Toast.LENGTH_SHORT;
 		Toast toast = Toast.makeText(context, s, duration);
 		toast.show();
 	}
