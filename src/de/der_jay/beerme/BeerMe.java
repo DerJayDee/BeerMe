@@ -1,32 +1,112 @@
 package de.der_jay.beerme;
 
 import android.app.Activity;
-import android.content.Intent;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
+import android.widget.Toast;
 
-
+/**
+ * Main Activity of BeerMe.
+ * 
+ * @author JDegenhardt
+ * 
+ */
 public class BeerMe extends Activity {
 
+	private final String SMALL_BEER = "de.der_jay.beerme.SMALL_BEER";
+	private final String LARGE_BEER = "de.der_jay.beerme.LARGE_BEER";
+
+	private int smallBeer;
+	private int largeBeer;
+
+	/**
+	 * This Method creates the Activity and sets the variables either 0 or the
+	 * value they were set to the last time that this Activity was run.
+	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.beerme);
+
+		SharedPreferences sp = getPreferences(MODE_PRIVATE);
+
+		smallBeer = sp.getInt(SMALL_BEER, 0);
+		largeBeer = sp.getInt(LARGE_BEER, 0);
+
+		if (savedInstanceState != null) {
+			smallBeer = savedInstanceState.getInt(SMALL_BEER);
+			largeBeer = savedInstanceState.getInt(LARGE_BEER);
+		}
 	}
-	
-    
-	public void addSmallBeer(View view){
-		System.out.println("+small beer");
+
+	/**
+	 * This Method is called whenever the Activity is paused, exited
+	 * or destroyed. It saves the current set variables in the SharedPreferences.
+	 */
+	@Override
+	protected void onPause() {
+		super.onPause();
+		SharedPreferences sp = getPreferences(MODE_PRIVATE);
+		SharedPreferences.Editor editor = sp.edit();
+		editor.putInt(LARGE_BEER, largeBeer);
+		editor.putInt(SMALL_BEER, smallBeer);
+		editor.commit();
 	}
-	
-	public void addLargeBeer(View view){
-		System.out.println("+large beer");
+
+	/**
+	 * This Method is called whenever the Activity has to be recreated due to
+	 * switching to landscape or something like that. It saves the current
+	 * variables to the Bundle that the onCreate-Method will receive when the
+	 * Activity is being rebuild.
+	 */
+	@Override
+	protected void onSaveInstanceState(Bundle status) {
+		super.onSaveInstanceState(status);
+		status.putInt(SMALL_BEER, smallBeer);
+		status.putInt(LARGE_BEER, largeBeer);
 	}
-	
-	protected void reset(View view){
-		System.out.println("rese all counters");
+
+	/**
+	 * Method that is called if the Button with the ID 'id/button_small_beer' is
+	 * clicked.
+	 * 
+	 * @param view
+	 */
+	public void addSmallBeer(View view) {
+		smallBeer++;
+		tToast("small Beer:" + smallBeer);
+	}
+
+	/**
+	 * Method that is called if the Button with the ID 'id/button_large_beer' is
+	 * clicked.
+	 * 
+	 * @param view
+	 */
+	public void addLargeBeer(View view) {
+		largeBeer++;
+		tToast("large Beer:" + largeBeer);
+	}
+
+	public void reset(View view) {
+		smallBeer = 0;
+		largeBeer = 0;
+		tToast("reseed all counters");
+	}
+
+	/**
+	 * Method for displaying Toasts showing the String s.
+	 * 
+	 * @param s
+	 *            The String that should be shown in the Toast.
+	 */
+	private void tToast(String s) {
+		Context context = getApplicationContext();
+		int duration = Toast.LENGTH_LONG;
+		Toast toast = Toast.makeText(context, s, duration);
+		toast.show();
 	}
 }

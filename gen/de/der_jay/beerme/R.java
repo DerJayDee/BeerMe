@@ -14,8 +14,14 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int button_large_beer=0x7f050000;
-        public static final int button_small_beer=0x7f050001;
+        public static final int button_large_beer=0x7f050003;
+        public static final int button_small_beer=0x7f050007;
+        public static final int large_beer=0x7f050001;
+        public static final int large_beer_count=0x7f050002;
+        public static final int small_beer=0x7f050005;
+        public static final int small_beer_count=0x7f050006;
+        public static final int table_large_beer=0x7f050000;
+        public static final int table_small_beer=0x7f050004;
     }
     public static final class layout {
         public static final int beerme=0x7f030000;
@@ -24,5 +30,7 @@ public final class R {
         public static final int app_name=0x7f040000;
         public static final int button_large_beer=0x7f040002;
         public static final int button_small_beer=0x7f040001;
+        public static final int large_beer=0x7f040004;
+        public static final int small_beer=0x7f040003;
     }
 }
