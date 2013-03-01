@@ -6,5 +6,6 @@
     <string name="button_large_beer">Add large beer</string>
     <string name="small_beer">Small Beer: </string>
     <string name="large_beer">Large Beer: </string>
+    <string name="button_reset">Reset</string>
 
 </resources>
