@@ -4,7 +4,7 @@
     <string name="app_name">BeerMe</string>
     <string name="button_small_beer">Add small beer</string>
     <string name="button_large_beer">Add large beer</string>
-    <string name="small_beer">Small Beer</string>
-    <string name="large_beer">Large Beer</string>
+    <string name="small_beer">Small Beer: </string>
+    <string name="large_beer">Large Beer: </string>
 
 </resources>

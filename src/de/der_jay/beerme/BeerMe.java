@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -40,6 +41,11 @@ public class BeerMe extends Activity {
 			smallBeer = savedInstanceState.getInt(SMALL_BEER);
 			largeBeer = savedInstanceState.getInt(LARGE_BEER);
 		}
+		
+		TextView tw = (TextView)findViewById(R.id.small_beer_count);
+		tw.setText(""+smallBeer);
+		tw = (TextView)findViewById(R.id.large_beer_count);
+		tw.setText(""+largeBeer);
 	}
 
 	/**
@@ -77,7 +83,8 @@ public class BeerMe extends Activity {
 	 */
 	public void addSmallBeer(View view) {
 		smallBeer++;
-		tToast("small Beer:" + smallBeer);
+		postToast("small Beer:" + smallBeer);
+		setTextView(R.id.small_beer_count, ""+smallBeer);
 	}
 
 	/**
@@ -88,13 +95,14 @@ public class BeerMe extends Activity {
 	 */
 	public void addLargeBeer(View view) {
 		largeBeer++;
-		tToast("large Beer:" + largeBeer);
+		postToast("large Beer:" + largeBeer);
+		setTextView(R.id.large_beer_count, ""+largeBeer);
 	}
 
 	public void reset(View view) {
 		smallBeer = 0;
 		largeBeer = 0;
-		tToast("reseed all counters");
+		postToast("reseed all counters");
 	}
 
 	/**
@@ -103,10 +111,15 @@ public class BeerMe extends Activity {
 	 * @param s
 	 *            The String that should be shown in the Toast.
 	 */
-	private void tToast(String s) {
+	private void postToast(String s) {
 		Context context = getApplicationContext();
 		int duration = Toast.LENGTH_LONG;
 		Toast toast = Toast.makeText(context, s, duration);
 		toast.show();
+	}
+	
+	private void setTextView(int textViewID, String s){
+		TextView tw = (TextView)findViewById(textViewID);
+		tw.setText(s);
 	}
 }
