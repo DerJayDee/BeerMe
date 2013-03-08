@@ -1,7 +1,9 @@
 package de.der_jay.beerme;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
@@ -28,7 +30,10 @@ public class BeerMe extends Activity {
 	/** Counter for the amount of largeBeer */
 	private int largeBeer;
 
-	/** Displayes what was last changed: 0 --> nothing to undo, 1 --> small beer, 2 --> large beer */
+	/**
+	 * Displayes what was last changed: 0 --> nothing to undo, 1 --> small beer,
+	 * 2 --> large beer
+	 */
 	private int lastChanged;
 
 	/**
@@ -115,23 +120,23 @@ public class BeerMe extends Activity {
 		switch (lastChanged) {
 		case 1:
 			smallBeer--;
-			setTextView(R.id.small_beer_count, ""+smallBeer);
+			setTextView(R.id.small_beer_count, "" + smallBeer);
 			undone = true;
 			lastChanged = 0;
 			break;
 		case 2:
 			largeBeer--;
-			setTextView(R.id.large_beer_count, ""+largeBeer);
+			setTextView(R.id.large_beer_count, "" + largeBeer);
 			undone = true;
 			lastChanged = 0;
 			break;
 		}
-		if(undone){
+		if (undone) {
 			postToast(getString(R.string.undone));
 		} else {
 			postToast(getString(R.string.no_undo));
 		}
-		
+
 	}
 
 	/**
@@ -141,12 +146,30 @@ public class BeerMe extends Activity {
 	 * @param view
 	 */
 	public void reset(View view) {
-		smallBeer = 0;
-		largeBeer = 0;
-		// postToast("reseted all counters");
-		setTextView(R.id.large_beer_count, "" + largeBeer);
-		setTextView(R.id.small_beer_count, "" + smallBeer);
-		postToast(getString(R.string.reseted));
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.dialog_text);
+		builder.setPositiveButton(R.string.dialog_confirm,
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int id) {
+						smallBeer = 0;
+						largeBeer = 0;
+						setTextView(R.id.large_beer_count, "" + largeBeer);
+						setTextView(R.id.small_beer_count, "" + smallBeer);
+						postToast(getString(R.string.reseted));
+					}
+				});
+		builder.setNegativeButton(R.string.dialog_disconfirm,
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int id) {
+
+					}
+				});
+		AlertDialog alert = builder.create();
+		alert.show();
 	}
 
 	/**
