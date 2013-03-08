@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +24,9 @@ public class BeerMe extends Activity {
 
 	/** String for accessing the SharedPreferences set for LARGE BEER */
 	private final String LARGE_BEER = "de.der_jay.beerme.LARGE_BEER";
+
+	/** String for accessing the SharedPreferences set for LAST_CHANGED */
+	private final String LAST_CHANGED = "de.der_jay.beerme.LAST_CHANGED";
 
 	/** Counter for the amount of smallBeer */
 	private int smallBeer;
@@ -50,16 +54,25 @@ public class BeerMe extends Activity {
 
 		smallBeer = sp.getInt(SMALL_BEER, 0);
 		largeBeer = sp.getInt(LARGE_BEER, 0);
+		lastChanged = sp.getInt(LAST_CHANGED, 0);
 
 		if (savedInstanceState != null) {
 			smallBeer = savedInstanceState.getInt(SMALL_BEER);
 			largeBeer = savedInstanceState.getInt(LARGE_BEER);
+			lastChanged = savedInstanceState.getInt(LAST_CHANGED);
 		}
 
 		TextView tw = (TextView) findViewById(R.id.small_beer_count);
 		tw.setText("" + smallBeer);
 		tw = (TextView) findViewById(R.id.large_beer_count);
 		tw.setText("" + largeBeer);
+
+		if (lastChanged == 0) {
+			disableUndoButton();
+		}
+		if(smallBeer == 0 && largeBeer == 0){
+			disableResetButton();
+		}
 	}
 
 	/**
@@ -73,6 +86,7 @@ public class BeerMe extends Activity {
 		SharedPreferences.Editor editor = sp.edit();
 		editor.putInt(LARGE_BEER, largeBeer);
 		editor.putInt(SMALL_BEER, smallBeer);
+		editor.putInt(LAST_CHANGED, lastChanged);
 		editor.commit();
 	}
 
@@ -87,6 +101,7 @@ public class BeerMe extends Activity {
 		super.onSaveInstanceState(status);
 		status.putInt(SMALL_BEER, smallBeer);
 		status.putInt(LARGE_BEER, largeBeer);
+		status.putInt(LAST_CHANGED, lastChanged);
 	}
 
 	/**
@@ -98,8 +113,8 @@ public class BeerMe extends Activity {
 	public void addSmallBeer(View view) {
 		smallBeer++;
 		lastChanged = 1;
-		// postToast("small Beer:" + smallBeer);
 		setTextView(R.id.small_beer_count, "" + smallBeer);
+		enableButtons();
 	}
 
 	/**
@@ -111,32 +126,28 @@ public class BeerMe extends Activity {
 	public void addLargeBeer(View view) {
 		largeBeer++;
 		lastChanged = 2;
-		// postToast("large Beer:" + largeBeer);
 		setTextView(R.id.large_beer_count, "" + largeBeer);
+		enableButtons();
 	}
 
 	public void undo(View view) {
-		boolean undone = false;
 		switch (lastChanged) {
 		case 1:
 			smallBeer--;
 			setTextView(R.id.small_beer_count, "" + smallBeer);
-			undone = true;
 			lastChanged = 0;
 			break;
 		case 2:
 			largeBeer--;
 			setTextView(R.id.large_beer_count, "" + largeBeer);
-			undone = true;
 			lastChanged = 0;
 			break;
 		}
-		if (undone) {
-			postToast(getString(R.string.undone));
-		} else {
-			postToast(getString(R.string.no_undo));
+		postToast(getString(R.string.undone));
+		disableUndoButton();
+		if(smallBeer == 0 && largeBeer == 0){
+			disableResetButton();
 		}
-
 	}
 
 	/**
@@ -157,6 +168,7 @@ public class BeerMe extends Activity {
 						largeBeer = 0;
 						setTextView(R.id.large_beer_count, "" + largeBeer);
 						setTextView(R.id.small_beer_count, "" + smallBeer);
+						disableButtons();
 						postToast(getString(R.string.reseted));
 					}
 				});
@@ -197,5 +209,35 @@ public class BeerMe extends Activity {
 	private void setTextView(int textViewID, String s) {
 		TextView tw = (TextView) findViewById(textViewID);
 		tw.setText(s);
+	}
+	
+	private void enableUndoButton(){
+		Button btn = (Button)findViewById(R.id.button_undo);
+		btn.setEnabled(true);
+	}
+	
+	private void disableUndoButton(){
+		Button btn = (Button)findViewById(R.id.button_undo);
+		btn.setEnabled(false);
+	}
+	
+	private void enableResetButon(){
+		Button btn = (Button)findViewById(R.id.button_reset);
+		btn.setEnabled(true);
+	}
+	
+	private void disableResetButton(){
+		Button btn = (Button)findViewById(R.id.button_reset);
+		btn.setEnabled(false);
+	}
+	
+	private void enableButtons(){
+		enableResetButon();
+		enableUndoButton();
+	}
+	
+	private void disableButtons(){
+		disableResetButton();
+		disableUndoButton();
 	}
 }

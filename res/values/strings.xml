@@ -9,9 +9,9 @@
     <string name="button_reset">Reset</string>
     <string name="button_undo">Undo</string>
     <string name="undone">undone</string>
-    <string name="no_undo">nothing to undo</string>
     <string name="reseted">reset successful</string>
-	<string name="dialog_text">Do you want to reset the counters?</string>
-	<string name="dialog_confirm">Reset</string>
-	<string name="dialog_disconfirm">Cancel</string>
+    <string name="dialog_text">Do you want to reset the counters?</string>
+    <string name="dialog_confirm">Reset</string>
+    <string name="dialog_disconfirm">Cancel</string>
+
 </resources>
