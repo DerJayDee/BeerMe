@@ -211,31 +211,49 @@ public class BeerMe extends Activity {
 		tw.setText(s);
 	}
 	
+	/**
+	 * This Method enables the Undo-Button.
+	 */
 	private void enableUndoButton(){
 		Button btn = (Button)findViewById(R.id.button_undo);
 		btn.setEnabled(true);
 	}
-	
+
+	/**
+	 * This Method disables the Undo-Button.
+	 */
 	private void disableUndoButton(){
 		Button btn = (Button)findViewById(R.id.button_undo);
 		btn.setEnabled(false);
 	}
 	
+	/**
+	 * This Method enables the Reset-Button.
+	 */
 	private void enableResetButon(){
 		Button btn = (Button)findViewById(R.id.button_reset);
 		btn.setEnabled(true);
 	}
 	
+	/**
+	 * This Method disables the Reset-Button.
+	 */
 	private void disableResetButton(){
 		Button btn = (Button)findViewById(R.id.button_reset);
 		btn.setEnabled(false);
 	}
 	
+	/**
+	 * This Method enables the Undo- and the Reset-Button.
+	 */
 	private void enableButtons(){
 		enableResetButon();
 		enableUndoButton();
 	}
 	
+	/**
+	 * This Method disables the Undo- and the Reset-Button.
+	 */
 	private void disableButtons(){
 		disableResetButton();
 		disableUndoButton();
