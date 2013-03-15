@@ -23,26 +23,26 @@ import android.widget.Toast;
  */
 public class BeerMe extends Activity {
 
-	/** String for accessing the SharedPreferences set for SMALL BEER */
-	private final String SMALL_BEER = "de.der_jay.beerme.SMALL_BEER";
+	/** String for accessing the SharedPreferences set for CHANGES */
+	private final String CHANGES = "de.der_jay.beerme.CHANGES";
 
 	/** String for accessing the SharedPreferences set for LARGE BEER */
 	private final String LARGE_BEER = "de.der_jay.beerme.LARGE_BEER";
 
-	/** String for accessing the SharedPreferences set for CHANGES */
-	private final String CHANGES = "de.der_jay.beerme.CHANGES";
+	/** String for accessing the SharedPreferences set for SMALL BEER */
+	private final String SMALL_BEER = "de.der_jay.beerme.SMALL_BEER";
 
-	/** Counter for the amount of smallBeer */
-	private int smallBeer;
+	/**
+	 * Displayes the change history: 0 --> nothing to undo, 1 --> small beer, 2
+	 * --> large beer
+	 */
+	private Stack<Integer> changes;
 
 	/** Counter for the amount of largeBeer */
 	private int largeBeer;
 
-	/**
-	 * Displayes the change history: 0 --> nothing to undo, 1 --> small beer,
-	 * 2 --> large beer
-	 */
-	private Stack<Integer> changes;
+	/** Counter for the amount of smallBeer */
+	private int smallBeer;
 
 	/**
 	 * This Method creates the Activity and sets the variables either 0 or the
@@ -71,8 +71,8 @@ public class BeerMe extends Activity {
 		tw.setText("" + smallBeer);
 		tw = (TextView) findViewById(R.id.large_beer_count);
 		tw.setText("" + largeBeer);
-		
-		if(changes.isEmpty()){
+
+		if (changes.isEmpty()) {
 			changes.push(0);
 		}
 	}
@@ -91,7 +91,7 @@ public class BeerMe extends Activity {
 		editor.putString(CHANGES, createChanges());
 		editor.commit();
 	}
-	
+
 	/**
 	 * This Method is called whenever the Activity has to be recreated due to
 	 * switching to landscape or something like that. It saves the current
@@ -106,6 +106,10 @@ public class BeerMe extends Activity {
 		status.putString(CHANGES, createChanges());
 	}
 
+	/**
+	 * This Method is called when the Options Menu is created for the first
+	 * time.
+	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater menuInflater = getMenuInflater();
@@ -113,9 +117,13 @@ public class BeerMe extends Activity {
 		return true;
 	}
 
+	/**
+	 * This Method is called whenever "invalidateOptionsMenu()" gets called.
+	 */
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		// UNDO
-		menu.getItem(0).setEnabled(!changes.isEmpty() && changes.lastElement() != 0);
+		menu.getItem(0).setEnabled(
+				!changes.isEmpty() && changes.lastElement() != 0);
 		// RESET
 		menu.getItem(1).setEnabled(smallBeer != 0 || largeBeer != 0);
 		return true;
@@ -123,7 +131,7 @@ public class BeerMe extends Activity {
 
 	/**
 	 * Event Handling for Individual menu item selected Identify single menu
-	 * item by it's id
+	 * item by it's ID.
 	 * */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -141,6 +149,19 @@ public class BeerMe extends Activity {
 	}
 
 	/**
+	 * Method that is called if the Button with the ID 'id/button_large_beer' is
+	 * clicked.
+	 * 
+	 * @param view
+	 */
+	public void addLargeBeer(View view) {
+		largeBeer++;
+		changes.push(2);
+		setTextView(R.id.large_beer_count, "" + largeBeer);
+		invalidateOptionsMenu();
+	}
+
+	/**
 	 * Method that is called if the Button with the ID 'id/button_small_beer' is
 	 * clicked.
 	 * 
@@ -154,16 +175,36 @@ public class BeerMe extends Activity {
 	}
 
 	/**
-	 * Method that is called if the Button with the ID 'id/button_large_beer' is
-	 * clicked.
-	 * 
-	 * @param view
+	 * This Method is called, when the Option R.id.menu_reset has been selected.
 	 */
-	public void addLargeBeer(View view) {
-		largeBeer++;
-		changes.push(2);
-		setTextView(R.id.large_beer_count, "" + largeBeer);
-		invalidateOptionsMenu();
+	private void reset() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.dialog_text);
+		builder.setPositiveButton(R.string.dialog_confirm,
+				new DialogInterface.OnClickListener() {
+	
+					@Override
+					public void onClick(DialogInterface dialog, int id) {
+						smallBeer = 0;
+						largeBeer = 0;
+						changes.clear();
+						changes.push(0);
+						setTextView(R.id.large_beer_count, "" + largeBeer);
+						setTextView(R.id.small_beer_count, "" + smallBeer);
+						postToast(getString(R.string.reseted));
+						invalidateOptionsMenu();
+					}
+				});
+		builder.setNegativeButton(R.string.dialog_disconfirm,
+				new DialogInterface.OnClickListener() {
+	
+					@Override
+					public void onClick(DialogInterface dialog, int id) {
+	
+					}
+				});
+		AlertDialog alert = builder.create();
+		alert.show();
 	}
 
 	/**
@@ -185,36 +226,18 @@ public class BeerMe extends Activity {
 	}
 
 	/**
-	 * This Method is called, when the Option R.id.menu_reset has been selected.
+	 * This Method constructs a String from all the Integers stacked in the
+	 * changes-Stack.
+	 * 
+	 * @return
 	 */
-	private void reset() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(R.string.dialog_text);
-		builder.setPositiveButton(R.string.dialog_confirm,
-				new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int id) {
-						smallBeer = 0;
-						largeBeer = 0;
-						changes.clear();
-						changes.push(0);
-						setTextView(R.id.large_beer_count, "" + largeBeer);
-						setTextView(R.id.small_beer_count, "" + smallBeer);
-						postToast(getString(R.string.reseted));
-						invalidateOptionsMenu();
-					}
-				});
-		builder.setNegativeButton(R.string.dialog_disconfirm,
-				new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int id) {
-
-					}
-				});
-		AlertDialog alert = builder.create();
-		alert.show();
+	private String createChanges() {
+		String s = "";
+		while (!changes.isEmpty()) {
+			s += changes.pop();
+		}
+		setChanges(s);
+		return s;
 	}
 
 	/**
@@ -231,6 +254,18 @@ public class BeerMe extends Activity {
 	}
 
 	/**
+	 * This Method parses the String s to Integer values that represent the
+	 * change history and pushes the Integers into the changes-Stack.
+	 * 
+	 * @param s
+	 */
+	private void setChanges(String s) {
+		for (int i = s.length() - 1; i >= 0; i--) {
+			changes.push(Integer.parseInt("" + s.charAt(i)));
+		}
+	}
+
+	/**
 	 * Method for setting the text in a TextView wih the ID textViewID to the
 	 * String s.
 	 * 
@@ -242,20 +277,5 @@ public class BeerMe extends Activity {
 	private void setTextView(int textViewID, String s) {
 		TextView tw = (TextView) findViewById(textViewID);
 		tw.setText(s);
-	}
-
-	private void setChanges(String s){
-		for(int i = s.length()-1; i >= 0; i--){
-			changes.push(Integer.parseInt(""+s.charAt(i)));
-		}
-	}
-	
-	private String createChanges(){
-		String s = "";
-		while(!changes.isEmpty()){
-			s += changes.pop();
-		}
-		setChanges(s);
-		return s;
 	}
 }
