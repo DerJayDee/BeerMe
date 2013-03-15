@@ -6,12 +6,13 @@
     <string name="button_large_beer">gr. Bier hinzufügen</string>
     <string name="small_beer">kl. Bier: </string>
     <string name="large_beer">gr. Bier: </string>
-    <string name="button_reset">Zähler zurücksetzen</string>
-    <string name="button_undo">Rückgängig</string>
+    <string name="menu_reset">Zähler zurücksetzen</string>
+    <string name="menu_undo">Rückgängig</string>
     <string name="undone">rückgängig gemacht</string>
     <string name="reseted">Alle Werte zurückgesetzt.</string>
     <string name="dialog_text">Wollen Sie die Zähler wirklich zurücksetzen?</string>
     <string name="dialog_confirm">Zurücksetzen</string>
     <string name="dialog_disconfirm">Abbrechen</string>
+    <string name="nothing_to_undo">Es kann nichts rückgängig gemacht werden.</string>
 
 </resources>

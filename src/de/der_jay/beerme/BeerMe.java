@@ -6,8 +6,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -67,12 +69,6 @@ public class BeerMe extends Activity {
 		tw = (TextView) findViewById(R.id.large_beer_count);
 		tw.setText("" + largeBeer);
 
-		if (lastChanged == 0) {
-			disableUndoButton();
-		}
-		if(smallBeer == 0 && largeBeer == 0){
-			disableResetButton();
-		}
 	}
 
 	/**
@@ -104,6 +100,40 @@ public class BeerMe extends Activity {
 		status.putInt(LAST_CHANGED, lastChanged);
 	}
 
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater menuInflater = getMenuInflater();
+		menuInflater.inflate(R.menu.options_menu, menu);
+		return true;
+	}
+
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		// UNDO
+		menu.getItem(0).setEnabled(lastChanged != 0);
+		// RESET
+		menu.getItem(1).setEnabled(smallBeer != 0 || largeBeer != 0);
+		return true;
+	}
+
+	/**
+	 * Event Handling for Individual menu item selected Identify single menu
+	 * item by it's id
+	 * */
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+
+		switch (item.getItemId()) {
+		case R.id.menu_undo:
+			undo();
+			return true;
+		case R.id.menu_reset:
+			reset();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
+
 	/**
 	 * Method that is called if the Button with the ID 'id/button_small_beer' is
 	 * clicked.
@@ -114,7 +144,7 @@ public class BeerMe extends Activity {
 		smallBeer++;
 		lastChanged = 1;
 		setTextView(R.id.small_beer_count, "" + smallBeer);
-		enableButtons();
+		invalidateOptionsMenu();
 	}
 
 	/**
@@ -127,36 +157,32 @@ public class BeerMe extends Activity {
 		largeBeer++;
 		lastChanged = 2;
 		setTextView(R.id.large_beer_count, "" + largeBeer);
-		enableButtons();
+		invalidateOptionsMenu();
 	}
 
-	public void undo(View view) {
+	/**
+	 * This Method is called, when the Option R.id.menu_undo has been selected.
+	 */
+	private void undo() {
 		switch (lastChanged) {
 		case 1:
 			smallBeer--;
 			setTextView(R.id.small_beer_count, "" + smallBeer);
-			lastChanged = 0;
 			break;
 		case 2:
 			largeBeer--;
 			setTextView(R.id.large_beer_count, "" + largeBeer);
-			lastChanged = 0;
 			break;
 		}
 		postToast(getString(R.string.undone));
-		disableUndoButton();
-		if(smallBeer == 0 && largeBeer == 0){
-			disableResetButton();
-		}
+		lastChanged = 0;
+		invalidateOptionsMenu();
 	}
 
 	/**
-	 * Method that is called if the Button with the ID 'id/button_reset' is
-	 * clicked.
-	 * 
-	 * @param view
+	 * This Method is called, when the Option R.id.menu_reset has been selected.
 	 */
-	public void reset(View view) {
+	private void reset() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.dialog_text);
 		builder.setPositiveButton(R.string.dialog_confirm,
@@ -166,10 +192,11 @@ public class BeerMe extends Activity {
 					public void onClick(DialogInterface dialog, int id) {
 						smallBeer = 0;
 						largeBeer = 0;
+						lastChanged = 0;
 						setTextView(R.id.large_beer_count, "" + largeBeer);
 						setTextView(R.id.small_beer_count, "" + smallBeer);
-						disableButtons();
 						postToast(getString(R.string.reseted));
+						invalidateOptionsMenu();
 					}
 				});
 		builder.setNegativeButton(R.string.dialog_disconfirm,
@@ -209,53 +236,5 @@ public class BeerMe extends Activity {
 	private void setTextView(int textViewID, String s) {
 		TextView tw = (TextView) findViewById(textViewID);
 		tw.setText(s);
-	}
-	
-	/**
-	 * This Method enables the Undo-Button.
-	 */
-	private void enableUndoButton(){
-		Button btn = (Button)findViewById(R.id.button_undo);
-		btn.setEnabled(true);
-	}
-
-	/**
-	 * This Method disables the Undo-Button.
-	 */
-	private void disableUndoButton(){
-		Button btn = (Button)findViewById(R.id.button_undo);
-		btn.setEnabled(false);
-	}
-	
-	/**
-	 * This Method enables the Reset-Button.
-	 */
-	private void enableResetButon(){
-		Button btn = (Button)findViewById(R.id.button_reset);
-		btn.setEnabled(true);
-	}
-	
-	/**
-	 * This Method disables the Reset-Button.
-	 */
-	private void disableResetButton(){
-		Button btn = (Button)findViewById(R.id.button_reset);
-		btn.setEnabled(false);
-	}
-	
-	/**
-	 * This Method enables the Undo- and the Reset-Button.
-	 */
-	private void enableButtons(){
-		enableResetButon();
-		enableUndoButton();
-	}
-	
-	/**
-	 * This Method disables the Undo- and the Reset-Button.
-	 */
-	private void disableButtons(){
-		disableResetButton();
-		disableUndoButton();
 	}
 }
