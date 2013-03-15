@@ -1,5 +1,7 @@
 package de.der_jay.beerme;
 
+import java.util.Stack;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -27,8 +29,8 @@ public class BeerMe extends Activity {
 	/** String for accessing the SharedPreferences set for LARGE BEER */
 	private final String LARGE_BEER = "de.der_jay.beerme.LARGE_BEER";
 
-	/** String for accessing the SharedPreferences set for LAST_CHANGED */
-	private final String LAST_CHANGED = "de.der_jay.beerme.LAST_CHANGED";
+	/** String for accessing the SharedPreferences set for CHANGES */
+	private final String CHANGES = "de.der_jay.beerme.CHANGES";
 
 	/** Counter for the amount of smallBeer */
 	private int smallBeer;
@@ -37,10 +39,10 @@ public class BeerMe extends Activity {
 	private int largeBeer;
 
 	/**
-	 * Displayes what was last changed: 0 --> nothing to undo, 1 --> small beer,
+	 * Displayes the change history: 0 --> nothing to undo, 1 --> small beer,
 	 * 2 --> large beer
 	 */
-	private int lastChanged;
+	private Stack<Integer> changes;
 
 	/**
 	 * This Method creates the Activity and sets the variables either 0 or the
@@ -49,6 +51,7 @@ public class BeerMe extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		changes = new Stack<Integer>();
 
 		setContentView(R.layout.beerme);
 
@@ -56,19 +59,22 @@ public class BeerMe extends Activity {
 
 		smallBeer = sp.getInt(SMALL_BEER, 0);
 		largeBeer = sp.getInt(LARGE_BEER, 0);
-		lastChanged = sp.getInt(LAST_CHANGED, 0);
+		setChanges(sp.getString(CHANGES, ""));
 
 		if (savedInstanceState != null) {
 			smallBeer = savedInstanceState.getInt(SMALL_BEER);
 			largeBeer = savedInstanceState.getInt(LARGE_BEER);
-			lastChanged = savedInstanceState.getInt(LAST_CHANGED);
+			setChanges(savedInstanceState.getString(CHANGES));
 		}
 
 		TextView tw = (TextView) findViewById(R.id.small_beer_count);
 		tw.setText("" + smallBeer);
 		tw = (TextView) findViewById(R.id.large_beer_count);
 		tw.setText("" + largeBeer);
-
+		
+		if(changes.isEmpty()){
+			changes.push(0);
+		}
 	}
 
 	/**
@@ -82,10 +88,10 @@ public class BeerMe extends Activity {
 		SharedPreferences.Editor editor = sp.edit();
 		editor.putInt(LARGE_BEER, largeBeer);
 		editor.putInt(SMALL_BEER, smallBeer);
-		editor.putInt(LAST_CHANGED, lastChanged);
+		editor.putString(CHANGES, createChanges());
 		editor.commit();
 	}
-
+	
 	/**
 	 * This Method is called whenever the Activity has to be recreated due to
 	 * switching to landscape or something like that. It saves the current
@@ -97,7 +103,7 @@ public class BeerMe extends Activity {
 		super.onSaveInstanceState(status);
 		status.putInt(SMALL_BEER, smallBeer);
 		status.putInt(LARGE_BEER, largeBeer);
-		status.putInt(LAST_CHANGED, lastChanged);
+		status.putString(CHANGES, createChanges());
 	}
 
 	@Override
@@ -109,7 +115,7 @@ public class BeerMe extends Activity {
 
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		// UNDO
-		menu.getItem(0).setEnabled(lastChanged != 0);
+		menu.getItem(0).setEnabled(!changes.isEmpty() && changes.lastElement() != 0);
 		// RESET
 		menu.getItem(1).setEnabled(smallBeer != 0 || largeBeer != 0);
 		return true;
@@ -142,7 +148,7 @@ public class BeerMe extends Activity {
 	 */
 	public void addSmallBeer(View view) {
 		smallBeer++;
-		lastChanged = 1;
+		changes.push(1);
 		setTextView(R.id.small_beer_count, "" + smallBeer);
 		invalidateOptionsMenu();
 	}
@@ -155,7 +161,7 @@ public class BeerMe extends Activity {
 	 */
 	public void addLargeBeer(View view) {
 		largeBeer++;
-		lastChanged = 2;
+		changes.push(2);
 		setTextView(R.id.large_beer_count, "" + largeBeer);
 		invalidateOptionsMenu();
 	}
@@ -164,7 +170,7 @@ public class BeerMe extends Activity {
 	 * This Method is called, when the Option R.id.menu_undo has been selected.
 	 */
 	private void undo() {
-		switch (lastChanged) {
+		switch (changes.pop()) {
 		case 1:
 			smallBeer--;
 			setTextView(R.id.small_beer_count, "" + smallBeer);
@@ -175,7 +181,6 @@ public class BeerMe extends Activity {
 			break;
 		}
 		postToast(getString(R.string.undone));
-		lastChanged = 0;
 		invalidateOptionsMenu();
 	}
 
@@ -192,7 +197,8 @@ public class BeerMe extends Activity {
 					public void onClick(DialogInterface dialog, int id) {
 						smallBeer = 0;
 						largeBeer = 0;
-						lastChanged = 0;
+						changes.clear();
+						changes.push(0);
 						setTextView(R.id.large_beer_count, "" + largeBeer);
 						setTextView(R.id.small_beer_count, "" + smallBeer);
 						postToast(getString(R.string.reseted));
@@ -225,7 +231,7 @@ public class BeerMe extends Activity {
 	}
 
 	/**
-	 * Method for setting the text in a TextView wihthe ID textViewID to the
+	 * Method for setting the text in a TextView wih the ID textViewID to the
 	 * String s.
 	 * 
 	 * @param textViewID
@@ -236,5 +242,20 @@ public class BeerMe extends Activity {
 	private void setTextView(int textViewID, String s) {
 		TextView tw = (TextView) findViewById(textViewID);
 		tw.setText(s);
+	}
+
+	private void setChanges(String s){
+		for(int i = s.length()-1; i >= 0; i--){
+			changes.push(Integer.parseInt(""+s.charAt(i)));
+		}
+	}
+	
+	private String createChanges(){
+		String s = "";
+		while(!changes.isEmpty()){
+			s += changes.pop();
+		}
+		setChanges(s);
+		return s;
 	}
 }
